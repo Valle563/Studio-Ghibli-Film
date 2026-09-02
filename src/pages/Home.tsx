@@ -1,28 +1,40 @@
-import { useDebugValue, useState } from "react";
+import { useState } from "react";
 import { type ApiState } from "../types/movie";
 import { getMovies } from "../api/movieApi";
-import MovieCard from "../components/MovieCard";
+import MovieCard from "../components/MovieCard.tsx";
 
-const Home = () => {
-  const [ApiState, setApiState] = useState<ApiState>({ status: "idle"})
+type Props = {
+  favoriteIds: string[];
+  onToggleFavorite: (id: string) => void;
+};
+
+const Home = ({ favoriteIds, onToggleFavorite }: Props) => {
+  const [apiState, setApiState] = useState<ApiState>({ status: "idle" });
 
   return (
     <div>
-      <h2> Home - alla filmer </h2>
-      <button onClick={() => getMovies(setApiState)}> Hämta filmer</button>
+      <h2>Home - alla filmer</h2>
+      <button onClick={() => getMovies(setApiState)}>Hämta filmer</button>
 
-      <p> Status: {ApiState.status}</p>
-      {ApiState.status === "error" && <p>{ApiState.message}</p>}
+      <p>Status: {apiState.status}</p>
+      {apiState.status === "error" && <p>{apiState.message}</p>}
 
-      {ApiState.status === "success" && (
+      {apiState.status === "success" && (
         <div className="movie-grid">
-          {ApiState.data.map((movie) =>(
-            <MovieCard key={movie.id} movie={movie}/>
-          ))}
+          {[...apiState.data]
+            .sort((a, b) => Number(b.release_date) - Number(a.release_date))
+            .map((movie) => (
+              <MovieCard
+                key={movie.id}
+                movie={movie}
+                isFavorite={favoriteIds.includes(movie.id)}
+                onToggleFavorite={() => onToggleFavorite(movie.id)}
+              />
+            ))}
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

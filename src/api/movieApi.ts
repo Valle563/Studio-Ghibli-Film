@@ -4,7 +4,7 @@ type ReactSet = (s: ApiState) => void;
 
 export async function getMovies(setApiState: ReactSet): Promise<void> {
   const url = "https://ghibliapi.vercel.app/films";
-
+  
   try {
     setApiState({ status: "loading" });
     const response = await fetch(url);
